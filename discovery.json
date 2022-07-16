@@ -1,0 +1,17 @@
+{
+  "botman/driver-config": [
+      "stubs/whatsapp.php"
+  ],
+  "botman/driver": [
+      "BotMan\\Drivers\\Whatsapp\\WhatsappDriver",
+      "BotMan\\Drivers\\Whatsapp\\WhatsappAudioDriver",
+      "BotMan\\Drivers\\Whatsapp\\WhatsappFileDriver",
+      "BotMan\\Drivers\\Whatsapp\\WhatsappLocationDriver",
+      "BotMan\\Drivers\\Whatsapp\\WhatsappContactDriver",
+      "BotMan\\Drivers\\Whatsapp\\WhatsappPhotoDriver",
+      "BotMan\\Drivers\\Whatsapp\\WhatsappVideoDriver"
+  ],
+  "botman/commands": [
+      "BotMan\\Drivers\\Whatsapp\\Console\\Commands\\WhatsappRegisterCommand"
+  ]
+}

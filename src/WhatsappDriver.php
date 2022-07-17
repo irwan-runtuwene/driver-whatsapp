@@ -11,12 +11,23 @@ use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use BotMan\Drivers\Whatsapp\Extensions\ButtonTemplate;
 
 class WhatsappDriver extends HttpDriver
 {
     const DRIVER_NAME = 'Whatsapp';
 
     protected $endpoint = 'messages';
+
+    /** @var array */
+    protected $templates = [
+        ButtonTemplate::class,
+        // GenericTemplate::class,
+        // ListTemplate::class,
+        // ReceiptTemplate::class,
+        // MediaTemplate::class,
+        // OpenGraphTemplate::class,
+    ];
 
     /**
      * @var array
@@ -100,6 +111,10 @@ class WhatsappDriver extends HttpDriver
      */
     public function buildServicePayload($message, $matchingMessage, $additionalParameters = [])
     {
+        if (is_object($message) && in_array(get_class($message), $this->templates)) {
+            $parameters['message'] = $message->toArray();
+        }
+        
         return [
             'preview_url' => true,
             'recipient_type' => 'individual',

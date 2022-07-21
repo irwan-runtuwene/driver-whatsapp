@@ -6,17 +6,36 @@ use BotMan\BotMan\Drivers\HttpDriver;
 use BotMan\BotMan\Interfaces\UserInterface;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Incoming\IncomingMessage;
+use BotMan\BotMan\Messages\Outgoing\OutgoingMessage;
 use BotMan\BotMan\Users\User;
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use BotMan\Drivers\Whatsapp\Extensions\ButtonTemplate as BT;
 
 class WhatsappDriver extends HttpDriver
 {
     const DRIVER_NAME = 'Whatsapp';
 
     protected $endpoint = 'messages';
+
+    /** @var array */
+    protected $templates = [
+        BT::class,
+        // GenericTemplate::class,
+        // ListTemplate::class,
+        // ReceiptTemplate::class,
+        // MediaTemplate::class,
+        // OpenGraphTemplate::class,
+    ];
+
+    private $supportedAttachments = [
+        Video::class,
+        Audio::class,
+        Image::class,
+        File::class,
+    ];
 
     /**
      * @var array
@@ -100,15 +119,35 @@ class WhatsappDriver extends HttpDriver
      */
     public function buildServicePayload($message, $matchingMessage, $additionalParameters = [])
     {
-        return [
-            'preview_url' => true,
+
+        $parameters = array_merge_recursive([
             'recipient_type' => 'individual',
-            'to' => $matchingMessage->getSender(),
-            'type' => 'text',
-            'text' => [
+        ], $additionalParameters);
+
+        if ($message instanceof Question) {
+            $parameters['text'] = [
                 'body' => $message->getText()
-            ]
-        ];
+            ];
+        } elseif (is_object($message) && in_array(get_class($message), $this->templates)) {
+            if (get_class($message) === BT::class) {
+                $parameters['type'] = 'interactive';
+                $parameters['interactive'] = [
+                    'body' => $message->text,
+                    'action' => [
+                        'buttons' => $message->buttons,
+                    ]
+                ];
+            } else {
+                $parameters['text'] = [
+                    'body' => $message->text,
+                ];
+            }
+        } else {
+            $parameters['text'] = [
+                'body' => $message,
+            ];
+        }
+        return $parameters;
     }
 
     /**
@@ -161,10 +200,11 @@ class WhatsappDriver extends HttpDriver
 
     protected function buildAuthHeader()
     {
-        // TODO: Token should from DB & Re-Fetch before expired
-        // TODO: Should create Artisan command + Scheduler
+        /*
+        * TODO: Token should from DB & Re-Fetch before expired with Artisan command scheduler
+        */
         // $token = 'YOUR-BEARER-TOKEN-HERE';
-				$token = $this->config->get('token');
+        $token = $this->config->get('token');
 
         return [
             "Authorization: Bearer $token",

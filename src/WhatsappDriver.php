@@ -108,6 +108,15 @@ class WhatsappDriver extends HttpDriver
                         $this->payload
                     )
                 ];
+            } elseif ($this->event->get('type') == 'button') {
+                $this->messages = [
+                    new IncomingMessage(
+                        $this->event->get('button')['text'],
+                        $this->event->get('from'),
+                        $this->event->get('from'),
+                        $this->payload
+                    )
+                ];
             }
         }
 

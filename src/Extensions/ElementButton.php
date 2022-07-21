@@ -8,6 +8,9 @@ class ElementButton
     protected $title;
 
     /** @var string */
+    protected $id;
+
+    /** @var string */
     protected $type = self::TYPE_REPLY;
 
     /** @var string */
@@ -34,17 +37,18 @@ class ElementButton
      * @param  string  $title
      * @return static
      */
-    public static function create($title)
+    public static function create($id, $title)
     {
-        return new static($title);
+        return new static($id, $title);
     }
 
     /**
      * @param  string  $title
      */
-    public function __construct($title)
+    public function __construct($id, $title)
     {
         $this->title = $title;
+        $this->id = $id;
     }
 
     /**
@@ -108,49 +112,16 @@ class ElementButton
     }
 
     /**
-     * @return $this
-     */
-    public function disableShare()
-    {
-        $this->webview_share_button = 'HIDE';
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function removeHeightRatio()
-    {
-        $this->webview_height_ratio = null;
-
-        return $this;
-    }
-
-
-    /**
-     * Optional. The message that you wish the recipient of the share to see,
-     * if it is different from the one this button is attached to.
-     * The format follows that used in Send API, but must be a generic template with up to one URL button.
-     *
-     * @param  GenericTemplate  $shareContents
-     * @return $this
-     */
-    public function shareContents($shareContents)
-    {
-        $this->shareContents = $shareContents;
-
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function toArray()
     {
         $buttonArray = [
             'type' => $this->type,
-            'title' => $this->title
+            'reply' => [
+                'id' => $this->id,
+                'title' => $this->title,
+            ],
         ];
 
         return $buttonArray;

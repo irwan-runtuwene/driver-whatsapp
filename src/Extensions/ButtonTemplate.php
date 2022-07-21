@@ -11,18 +11,18 @@ class ButtonTemplate implements JsonSerializable, WebAccess
     protected $id;
 
     /** @var string */
-    protected $text;
+    public $text;
 
     /** @var array */
-    protected $buttons = [];
+    public $buttons = [];
 
     /**
      * @param $text
      * @return static
      */
-    public static function create($id, $text)
+    public static function create($text)
     {
-        return new static($id, $text);
+        return new static($text);
     }
 
     public function __construct($text)
@@ -63,9 +63,10 @@ class ButtonTemplate implements JsonSerializable, WebAccess
     {
         return [
             'type' => 'interactive',
-            'reply' => [
-                'id' => $this->id,
-                'title' => $this->text,
+            'interactive' => [
+                'action' => [
+                    'buttons' => $this->buttons,
+                ]
             ],
         ];
     }

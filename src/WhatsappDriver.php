@@ -40,7 +40,7 @@ class WhatsappDriver extends HttpDriver
     /**
      * @var array
      */
-    protected $messages = [];
+    public $messages = [];
 
     /**
      * @param Request $request
@@ -72,14 +72,43 @@ class WhatsappDriver extends HttpDriver
     public function getMessages()
     {
         if (empty($this->messages)) {
-            $this->messages = [
-                new IncomingMessage(
-                    $this->event->get('text')['body'],
-                    $this->event->get('from'),
-                    $this->event->get('from'),
-                    $this->payload
-                )
-            ];
+            if ($this->event->get('type') == 'text') {
+                $this->messages = [
+                    new IncomingMessage(
+                        $this->event->get('text')['body'],
+                        $this->event->get('from'),
+                        $this->event->get('from'),
+                        $this->payload
+                    )
+                ];
+            } elseif ($this->event->get('type') == 'image') {
+                $this->messages = [
+                    new IncomingMessage(
+                        isset($this->event->get('image')['caption']) ? $this->event->get('image')['caption'] : '',
+                        $this->event->get('from'),
+                        $this->event->get('from'),
+                        $this->payload
+                    )
+                ];
+            } elseif ($this->event->get('type') == 'document') {
+                $this->messages = [
+                    new IncomingMessage(
+                        isset($this->event->get('document')['caption']) ? $this->event->get('document')['caption'] : '',
+                        $this->event->get('from'),
+                        $this->event->get('from'),
+                        $this->payload
+                    )
+                ];
+            } elseif ($this->event->get('type') == 'location') {
+                $this->messages = [
+                    new IncomingMessage(
+                        $this->event->get('location')['name'],
+                        $this->event->get('from'),
+                        $this->event->get('from'),
+                        $this->payload
+                    )
+                ];
+            }
         }
 
         return $this->messages;

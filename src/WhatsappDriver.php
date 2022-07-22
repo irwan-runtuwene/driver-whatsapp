@@ -51,7 +51,7 @@ class WhatsappDriver extends HttpDriver
     public function buildPayload(Request $request)
     {
         $this->payload = new ParameterBag((array) json_decode($request->getContent(), true));
-        $this->event = Collection::make((array) $this->payload->get('messages') ? (array) $this->payload->get('messages')[0] : '');
+        $this->event = Collection::make((array) $this->payload->get('messages') ? (array) $this->payload->get('messages')[0] : $this->payload);
         $this->content = $request->getContent();
         $this->config = Collection::make($this->config->get('whatsapp', []));
     }
@@ -110,7 +110,7 @@ class WhatsappDriver extends HttpDriver
                         $this->payload
                     )
                 ];
-            } elseif ($this->event->get('type') == 'button') {
+            } elseif ($this->event->get('type') == 'button' || $this->event->get('type') == 'interactive') {
                 $this->messages = [
                     new IncomingMessage(
                         $this->event->get('button')['text'],

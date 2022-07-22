@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use BotMan\Drivers\Whatsapp\Extensions\ButtonTemplate as BT;
+use BotMan\Drivers\Whatsapp\Exeptions\WhatsappException;
+use BotMan\Drivers\Whatsapp\Exeptions\WhatsappConnectionException as WACE;
 
 class WhatsappDriver extends HttpDriver
 {
@@ -251,9 +253,8 @@ class WhatsappDriver extends HttpDriver
         */
         // $token = 'YOUR-BEARER-TOKEN-HERE';
         $token = $this->config->get('token');
-
         return [
-            "Authorization: Bearer $token",
+            "Authorization: Bearer " . $token,
             'Content-Type: application/json',
             'Accept: application/json'
         ];
@@ -295,6 +296,6 @@ class WhatsappDriver extends HttpDriver
             "Post Parameters: ".print_r($postParameters, true)."\n".
             "Headers: ". print_r($headers, true)."\n";
 
-        throw new WhatsappConnectionException($message);
+        throw new WACE($message);
     }
 }

@@ -157,20 +157,26 @@ class WhatsappDriver extends HttpDriver
      */
     public function buildServicePayload($message, $matchingMessage, $additionalParameters = [])
     {
+        $recipient = $matchingMessage->getRecipient() === '' ? $matchingMessage->getSender() : $matchingMessage->getRecipient();
 
         $parameters = array_merge_recursive([
             'recipient_type' => 'individual',
+            'to' => $recipient,
         ], $additionalParameters);
 
         if ($message instanceof Question) {
             $parameters['text'] = [
                 'body' => $message->getText()
             ];
+            $parameters['type'] = 'text';
         } elseif (is_object($message) && in_array(get_class($message), $this->templates)) {
             if (get_class($message) === BT::class) {
                 $parameters['type'] = 'interactive';
                 $parameters['interactive'] = [
-                    'body' => $message->text,
+                    'type' => 'button',
+                    'body' => [
+                        'text' => $message->text
+                    ],
                     'action' => [
                         'buttons' => $message->buttons,
                     ]
@@ -179,11 +185,13 @@ class WhatsappDriver extends HttpDriver
                 $parameters['text'] = [
                     'body' => $message->text,
                 ];
+                $parameters['type'] = 'text';
             }
         } else {
             $parameters['text'] = [
-                'body' => $message,
+                'body' => $message->getText(),
             ];
+            $parameters['type'] = 'text';
         }
         return $parameters;
     }

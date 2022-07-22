@@ -113,7 +113,7 @@ class WhatsappDriver extends HttpDriver
             } elseif ($this->event->get('type') == 'button' || $this->event->get('type') == 'interactive') {
                 $this->messages = [
                     new IncomingMessage(
-                        $this->event->get('button')['text'],
+                        isset($this->event->get('button')['text'])?$this->event->get('button')['text']:$this->event->get('interactive')['button_reply']['title'],
                         $this->event->get('from'),
                         $this->event->get('from'),
                         $this->payload
